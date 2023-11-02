@@ -1,0 +1,12 @@
+name: Loots
+version: '${project.version}'
+main: com.github.bfabri.loots.Loots
+softdepend:
+  - Holograms
+  - HolographicDisplays
+commands:
+  loot:
+    aliases:
+      - "crate"
+      - "cr"
+  key:
