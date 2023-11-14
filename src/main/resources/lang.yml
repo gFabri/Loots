@@ -1,0 +1,17 @@
+LOOT_CREATED: '&aLoot created!'
+LOOT_DELETED: '&cLoot deleted!'
+LOOT_ALREADY_EXISTS: '&cLoot already exists!'
+LOOT_DOES_NOT_EXIST: '&cLoot does not exist!'
+LOOT_RECEIVED: '&aYou received &f{loot} &aloot!'
+LOOT_ALL_RECEIVED: '&aYou received all loot!'
+
+KEY_RECEIVED: '&eYou received &7{key} &ekey!'
+KEY_GIVEN: '&eYou gave &7{}key} &ekey to &f{player}&a!'
+
+
+HOLOGRAMS:
+  lines:
+    - '{icon}' # only if is enabled.
+    - '{loot}'
+    - '&7Right cick to open.'
+    - '&7Left click to preview'

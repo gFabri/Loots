@@ -2,67 +2,103 @@ package com.github.bfabri.loots;
 
 import com.github.bfabri.loots.commands.utils.CommandsModule;
 import com.github.bfabri.loots.commands.utils.framework.SimpleCommandManager;
+import com.github.bfabri.loots.holograms.HologramInit;
+import com.github.bfabri.loots.listeners.InventoryConfigListener;
+import com.github.bfabri.loots.listeners.LootListener;
+import com.github.bfabri.loots.loot.Loot;
+import com.github.bfabri.loots.loot.LootInterface;
+import com.github.bfabri.loots.loot.LootJSON;
+import com.github.bfabri.loots.loot.Rewards;
+import com.github.bfabri.loots.loot.key.Key;
+import com.github.bfabri.loots.utils.Utils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.sql.SQLException;
 
 public class Loots extends JavaPlugin {
+
     @Getter
     private static Loots instance;
 
-    private LootUtils lootUtils;
+    @Getter
+    private LootInterface lootInterface;
 
-    private HologramUtils hologramUtils;
+    @Getter
+    private HologramInit hologramInit;
 
-    private SQLUtils sqlUtils;
-
-    public LootUtils getLootUtils() {
-        return this.lootUtils;
-    }
-
-    public HologramUtils getHologramUtils() {
-        return this.hologramUtils;
-    }
-
-    public SQLUtils getSqlUtils() {
-        return this.sqlUtils;
-    }
+    @Getter
+    private InventoryConfigListener inventoryConfigListener;
 
     public void onEnable() {
         instance = this;
         new ConfigHandler(this);
-        this.sqlUtils = new SQLUtils(this);
-        this.hologramUtils = new HologramUtils();
-        this.lootUtils = new LootUtils();
-        this.lootUtils.loadAllLoots(this);
-        this.lootUtils.loadAllPackages(this);
-        this.lootUtils.loadMetaData();
-        LootUtils.loadAllHolograms();
-        switch (getHologramUtils().getHologramPlugin()) {
+
+        ConfigurationSerialization.registerClass(Loot.class);
+        ConfigurationSerialization.registerClass(Rewards.class);
+        ConfigurationSerialization.registerClass(Key.class);
+
+        if (ConfigHandler.Configs.CONFIG.getConfig().getString("LOOTS.STORAGE.type").equalsIgnoreCase("JSON")) {
+            lootInterface = new LootJSON();
+        } else {
+//            lootInterface = new StatsMySQL();
+//            try {
+//                if (!((StatsMySQL) lootInterface).getConnection().isClosed()) {
+//                    lootInterface.loadStats();
+//                } else {
+//                    Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error with MySQL: Incorrect data in config.yml");
+//                    Bukkit.getPluginManager().disablePlugin(this);
+//                    return;
+//                }
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+        }
+
+        Bukkit.getConsoleSender().sendMessage(Utils.translate("&bDetected Server Version&7: &f" + Bukkit.getServer().getBukkitVersion().split("-")[0]));
+
+        this.hologramInit = new HologramInit();
+//        this.lootUtils.loadAllPackages(this);
+        switch (getHologramInit().getHologramPlugin()) {
             default:
                 Bukkit.getConsoleSender()
                         .sendMessage(ChatColor.RED + "Unable to find compatible Hologram plugin, holograms will not work!");
                 break;
-            case HOLOGRAPHIC_DISPLAYS:
-                Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&6&lLoots&8] &eHolographicDisplays was found, hooking in!"));
-                break;
             case HOLOGRAMS:
                 Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&6&lLoots&8] &eHolograms was found, hooking in!"));
                 break;
+            case DECENT_HOLOGRAMS:
+                Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&6&lLoots&8] &eDecent Holograms was found, hooking in!"));
+                break;
         }
+        hologramInit.getHologramPlugin().getHologram().loadAllHolograms();
         registerCommands();
         registerListeners();
+
+        (new BukkitRunnable() {
+            public void run() {
+                Bukkit.getConsoleSender().sendMessage(Utils.translate("&aSaving Loots..."));
+                if (ConfigHandler.Configs.CONFIG.getConfig().getString("LOOTS.STORAGE.type").equalsIgnoreCase("JSON")) {
+                    lootInterface.saveLoots();
+                }
+                Bukkit.getConsoleSender().sendMessage(Utils.translate("&aSaved loots"));
+            }
+        }).runTaskTimerAsynchronously(instance, 3000L, 6000L);
     }
 
     public void registerListeners() {
         PluginManager manager = Bukkit.getPluginManager();
-        manager.registerEvents((Listener)new LootListener(), (Plugin)this);
-        manager.registerEvents((Listener)new KeyListener(), (Plugin)this);
-        manager.registerEvents((Listener)new PackageListener(), (Plugin)this);
+        manager.registerEvents(new LootListener(), this);
+        manager.registerEvents(inventoryConfigListener = new InventoryConfigListener(), this);
+//        manager.registerEvents((Listener)new KeyListener(), (Plugin)this);
+//        manager.registerEvents((Listener)new PackageListener(), (Plugin)this);
     }
 
     private void registerCommands() {
@@ -70,7 +106,10 @@ public class Loots extends JavaPlugin {
     }
 
     public void onDisable() {
-        getHologramUtils().getHologramPlugin().getHologram().removeAll();
+        getHologramInit().getHologramPlugin().getHologram().removeAllHolograms();
+        if (ConfigHandler.Configs.CONFIG.getConfig().getString("LOOTS.STORAGE.type").equalsIgnoreCase("JSON")) {
+            lootInterface.saveLoots();
+        }
         instance = null;
     }
 }

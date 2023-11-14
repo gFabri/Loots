@@ -1,0 +1,8 @@
+LOOTS:
+  STORAGE:
+    type: "JSON" # MySQL
+    username: "root"
+    password: "password"
+    database: "database"
+    port: 3306
+    ip: "localhost"

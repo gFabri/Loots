@@ -4,9 +4,9 @@ main: com.github.bfabri.loots.Loots
 softdepend:
   - Holograms
   - HolographicDisplays
+  - DecentHolograms
 commands:
-  loot:
+  loots:
     aliases:
       - "crate"
       - "cr"
-  key:

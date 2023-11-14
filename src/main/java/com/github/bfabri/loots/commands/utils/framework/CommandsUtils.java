@@ -36,6 +36,31 @@ public class CommandsUtils {
 		sender.sendMessage(ChatColor.DARK_GRAY + "----------------------------------------------");
 	}
 
+	public static void printUsageWithoutCommands(CommandSender sender, String label, Collection<CommandArgument> arguments) {
+		sender.sendMessage(ChatColor.DARK_GRAY + "----------------------------------------------");
+		if (sender.hasPermission("loots.command.create")) {
+			sender.sendMessage(ChatColor.YELLOW + "/loots <loot> - " + ChatColor.WHITE + "Receive a loot.");
+			sender.sendMessage(ChatColor.YELLOW + "/loots all - " + ChatColor.WHITE + "Receive all loots.");
+		}
+		for (CommandArgument argument : arguments) {
+			String permission = argument.getPermission();
+			if (argument.getDescription() != null) {
+				if (permission == null || sender.hasPermission(permission)) {
+					ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, argument.getUsage(label));
+					String message = Utils.translate(String.format("&e%s &7- &f%s", argument.getUsage(label), argument.getDescription()));
+					TextComponent component = new TextComponent(TextComponent.fromLegacyText(message));
+					component.setClickEvent(clickEvent);
+					if (sender instanceof Player) {
+						((Player) sender).spigot().sendMessage(component);
+					} else {
+						sender.sendMessage(BaseComponent.toLegacyText(component));
+					}
+				}
+			}
+		}
+		sender.sendMessage(ChatColor.DARK_GRAY + "----------------------------------------------");
+	}
+
 	public static CommandArgument matchArgument(final String id, final CommandSender sender, final Collection<CommandArgument> arguments) {
 		for (final CommandArgument argument : arguments) {
 			final String permission = argument.getPermission();

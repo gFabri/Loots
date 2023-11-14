@@ -73,6 +73,15 @@ public class CustomItem {
         return this;
     }
 
+    public CustomItem addEnchantment(boolean add, Enchantment enchantment, int level) {
+        if (add) {
+            this.itemMeta.addEnchant(enchantment, level, true);
+        } else {
+            this.itemMeta.removeEnchant(enchantment);
+        }
+        return this;
+    }
+
     public CustomItem addLore(String... strings) {
         List<String> newLore = new ArrayList<>();
         for (String nowLore : strings) {

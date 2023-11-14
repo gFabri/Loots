@@ -2,13 +2,15 @@ package com.github.bfabri.loots.holograms;
 
 import java.util.ArrayList;
 
-import com.github.bfabri.loots.Loots;
+import com.github.bfabri.loots.loot.Loot;
 import org.bukkit.Location;
 
 public interface Hologram {
-  void create(Location paramLocation, Loots paramLoot, ArrayList<String> paramArrayList);
+  void createHologram(Location paramLocation, Loot paramLoot, ArrayList<String> paramArrayList);
   
-  void remove(Location paramLocation, Loots paramLoot);
+  void removeHologram(Location paramLocation, Loot paramLoot);
   
-  void removeAll();
+  void removeAllHolograms();
+
+  void loadAllHolograms();
 }
