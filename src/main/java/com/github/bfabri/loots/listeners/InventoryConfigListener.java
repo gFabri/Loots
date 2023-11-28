@@ -2,6 +2,7 @@ package com.github.bfabri.loots.listeners;
 
 import com.github.bfabri.loots.Loots;
 import com.github.bfabri.loots.loot.Loot;
+import com.github.bfabri.loots.loot.Rewards;
 import com.github.bfabri.loots.utils.CustomItem;
 import com.github.bfabri.loots.utils.Utils;
 import lombok.Getter;
@@ -16,8 +17,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -150,8 +153,30 @@ public class InventoryConfigListener implements Listener {
 					Loots.getInstance().getHologramInit().getHologramPlugin().getHologram().loadAllHolograms();
 				}
 			} else if (event.getSlot() == 25) {
-//				player.closeInventory();
-//				Loots.getInstance().getRewardInventoryListener().openRewardInventory(player, loot);
+				Inventory rewardsInventory = Loots.getInstance().getRewardsListener().getRewardsInventory();
+				rewardsInventory.clear();
+					for (int i = 27; i < 34; i++)
+						rewardsInventory.setItem(i, (new CustomItem(Utils.getMaterialByVersion("STAINED"), 1, 0)).setName("&c.").create());
+						loot.getRewards().forEach((slot, map) -> {
+							if (map != null) {
+								ItemStack itemStack = Rewards.deserialize(map);
+								ItemMeta meta = itemStack.getItemMeta();
+								List<String> lore = new ArrayList<>();
+								if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore())
+									lore = itemStack.getItemMeta().getLore();
+								lore.add(" ");
+								lore.add(Utils.translate("&eUse commands&7: " + map.get("useCommand")));
+								lore.add(" ");
+								lore.add(Utils.translate("&aLeft click to add commands on this item"));
+								lore.add(Utils.translate("&cRight click to remove commands on this item"));
+								lore.add(Utils.translate("&aShift left click to change enable or disable commands on this item"));
+								lore.add(Utils.translate("&eMiddle click to view list of commands"));
+								meta.setLore(lore);
+								itemStack.setItemMeta(meta);
+								rewardsInventory.setItem(slot.intValue(), itemStack);
+							}
+						});
+					player.openInventory(rewardsInventory);
 			}
 		}
 	}

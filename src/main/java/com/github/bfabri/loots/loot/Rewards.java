@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -99,19 +100,24 @@ public class Rewards implements ConfigurationSerializable {
 		return new CustomItem(Material.getMaterial(material), amount, data).setName(displayName).addLore(lore).addEnchantments(enchantments).create();
 	}
 
-	public void runItems(Player player, Map<String, Object> args) {
+	public org.bukkit.inventory.ItemStack getItemStack() {
+		return new CustomItem(Material.getMaterial(material), Integer.parseInt(amount), Short.parseShort(material_data)).setName(displayName).addLore(lore).addEnchantments(enchantments).create();
+	}
+
+	public ItemStack runItems(Player player, Rewards rewards) {
 		if (isUsePackage()) {
 //			player.getInventory().addItem(deserialize(args));
 		} else if (isUseCommand() && !getCommands().isEmpty()) {
 			Bukkit.getScheduler().runTaskLater(Loots.getInstance(), () -> runCommands(player), 0L);
 		} else if (!isUseCommand()) {
-			player.getInventory().addItem(deserialize(args));
+			return rewards.getItemStack();
 		}
+		return null;
 	}
 
 	private void runCommands(Player player) {
 		for (String command : getCommands()) {
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replaceAll("{player}", player.getName()));
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
 		}
 	}
 

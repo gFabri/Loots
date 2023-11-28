@@ -1,3 +1,4 @@
+PREFIX: "&7[&6Loots&7] &e"
 LOOT_CREATED: '&aLoot created!'
 LOOT_DELETED: '&cLoot deleted!'
 LOOT_ALREADY_EXISTS: '&cLoot already exists!'
@@ -7,7 +8,7 @@ LOOT_ALL_RECEIVED: '&aYou received all loot!'
 
 KEY_RECEIVED: '&eYou received &7{key} &ekey!'
 KEY_GIVEN: '&eYou gave &7{}key} &ekey to &f{player}&a!'
-
+CAN_NOT_PLACE_KEYS: '&cYou can not place keys here!'
 
 HOLOGRAMS:
   lines:

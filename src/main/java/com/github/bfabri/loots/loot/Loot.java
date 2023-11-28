@@ -1,5 +1,6 @@
 package com.github.bfabri.loots.loot;
 
+import com.github.bfabri.loots.Loots;
 import com.github.bfabri.loots.loot.key.Key;
 import com.github.bfabri.loots.utils.CustomItem;
 import com.github.bfabri.loots.utils.Utils;
@@ -150,36 +151,43 @@ public class Loot implements ConfigurationSerializable {
 	}
 
 	public Rewards handle(Player player, Rewards reward) {
-//		if (reward == null)
-//			reward = getRandomRewards();
-//		ItemStack itemStack = reward.runItems(player, reward);
-//		if (itemStack != null && itemStack.getType() == (Utils.isOldVersion() ? Material.valueOf("STAINED_GLASS_PANE") : Material.valueOf("LEGACY_STAINED_GLASS_PANE"))) {
-//			handle(player);
-//		} else if (itemStack != null) {
-//			player.getInventory().addItem(itemStack);
-//		}
+		if (reward == null) {
+			reward = getRandomRewards();
+		}
+		ItemStack itemStack = reward.runItems(player, reward);
+		if (itemStack != null && itemStack.getType() == (Utils.isOldVersion() ? Material.valueOf("STAINED_GLASS_PANE") : Material.valueOf("LEGACY_STAINED_GLASS_PANE"))) {
+			handle(player);
+		} else if (itemStack != null) {
+			player.getInventory().addItem(itemStack);
+		}
 		return reward;
 	}
 
-//	public Rewards getRandomRewards() {
-//		Rewards reward;
-//		if (getTotalPercentage() > 0.0D) {
-//			double totalWeight = 0.0D;
-//			for (Rewards rewards : getRewards().values())
-//				totalWeight += rewards.getPercentage();
-//			int randomIndex = -1;
-//			double random = Math.random() * totalWeight;
-//			for (int i = 0; i < rewards.size(); i++) {
-//				random -= (rewards.get(i)).getPercentage();
-//				if (random <= 0.0D) {
-//					randomIndex = i;
-//					break;
-//				}
-//			}
-//			reward = rewards.get(randomIndex);
-//		} else {
-//			return reward = getRewards().get(new Random().nextInt(0 - getRewards().size() + 1) + 0);
-//		}
-//		return reward;
-//	}
+	public Rewards getRandomRewards() {
+		Rewards reward;
+		if (getTotalPercentage() > 0.0D) {
+			Collection<Map<String, Object>> lootRewardsList = Loots.getInstance().getLootInterface().getLoot(this.name).getRewards().values();
+			double totalWeight = 0.0D;
+			for (Map<String, Object> rewards : lootRewardsList) {
+				totalWeight += new Rewards(rewards).getPercentage();
+			}
+			int randomIndex = -1;
+			double random = Math.random() * totalWeight;
+			for (int i = 0; i < this.rewards.size(); i++) {
+				random -= new Rewards(this.rewards.get(i)).getPercentage();
+				if (random <= 0.0D) {
+					randomIndex = i;
+					break;
+				}
+			}
+			reward = new Rewards(this.rewards.get(randomIndex));
+		} else {
+			reward = new Rewards(this.rewards.get(randInt(0, getRewards().size() - 1)));
+		}
+		return reward;
+	}
+
+	public int randInt(int min, int max) {
+		return (new Random()).nextInt(max - min + 1) + min;
+	}
 }

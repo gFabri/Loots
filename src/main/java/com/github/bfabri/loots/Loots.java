@@ -5,6 +5,7 @@ import com.github.bfabri.loots.commands.utils.framework.SimpleCommandManager;
 import com.github.bfabri.loots.holograms.HologramInit;
 import com.github.bfabri.loots.listeners.InventoryConfigListener;
 import com.github.bfabri.loots.listeners.LootListener;
+import com.github.bfabri.loots.listeners.RewardsListener;
 import com.github.bfabri.loots.loot.Loot;
 import com.github.bfabri.loots.loot.LootInterface;
 import com.github.bfabri.loots.loot.LootJSON;
@@ -36,6 +37,9 @@ public class Loots extends JavaPlugin {
 
     @Getter
     private InventoryConfigListener inventoryConfigListener;
+
+    @Getter
+    private RewardsListener rewardsListener;
 
     public void onEnable() {
         instance = this;
@@ -84,11 +88,11 @@ public class Loots extends JavaPlugin {
 
         (new BukkitRunnable() {
             public void run() {
-                Bukkit.getConsoleSender().sendMessage(Utils.translate("&aSaving Loots..."));
+                Bukkit.getConsoleSender().sendMessage(Utils.translate(Utils.PREFIX + "&aSaving Loots..."));
                 if (ConfigHandler.Configs.CONFIG.getConfig().getString("LOOTS.STORAGE.type").equalsIgnoreCase("JSON")) {
                     lootInterface.saveLoots();
                 }
-                Bukkit.getConsoleSender().sendMessage(Utils.translate("&aSaved loots"));
+                Bukkit.getConsoleSender().sendMessage(Utils.translate(Utils.PREFIX + "&aSaved loots"));
             }
         }).runTaskTimerAsynchronously(instance, 3000L, 6000L);
     }
@@ -97,6 +101,7 @@ public class Loots extends JavaPlugin {
         PluginManager manager = Bukkit.getPluginManager();
         manager.registerEvents(new LootListener(), this);
         manager.registerEvents(inventoryConfigListener = new InventoryConfigListener(), this);
+        manager.registerEvents(rewardsListener = new RewardsListener(), this);
 //        manager.registerEvents((Listener)new KeyListener(), (Plugin)this);
 //        manager.registerEvents((Listener)new PackageListener(), (Plugin)this);
     }

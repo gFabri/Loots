@@ -1,5 +1,6 @@
 package com.github.bfabri.loots.utils;
 
+import com.github.bfabri.loots.ConfigHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -11,6 +12,8 @@ public class Utils {
 
 	private static final Map<String, String> soundByString = new HashMap<>();
 	private static final Map<String, String> materialByString = new HashMap<>();
+
+	public static String PREFIX = Utils.translate(ConfigHandler.Configs.LANG.getConfig().getString("PREFIX"));
 
 	static {
 		String version = Bukkit.getServer().getBukkitVersion().split("-")[0];
